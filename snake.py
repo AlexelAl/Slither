@@ -10,6 +10,9 @@ class Snake():
                 coord=(WIDTH//CELL_SIZE//2, HEIGHT//CELL_SIZE//2)):
         self.start_lenth = lenth
 
+        self.head = pg.Surface((CELL_SIZE, CELL_SIZE))
+        self.head.fill(WHITE)
+
         self.material = material
         self.material = pg.transform.scale(self.material, (WIDTH, HEIGHT))
 
@@ -58,6 +61,8 @@ class Snake():
             self.rect.topleft = curr_coord
             if i[0] < 66 and i[1] < 66:
                 surf.blit(material_matrix[i[0]][i[1]], self.rect)
+                if i == self.body[0]:
+                    surf.blit(self.head, self.rect)
             if i == last and i != self.body[0]:
                 break
             last = i

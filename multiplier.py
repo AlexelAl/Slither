@@ -1,5 +1,6 @@
 import pygame as pg
 from set import *
+from images import click_lights
 import random
 
 class Multiplier():
@@ -25,13 +26,13 @@ class Multiplier():
                 self.multy = 2
             self.in_field = False
         elif not self.in_field:
-            chance = random.randint(0, 1000)
-            if chance == 999:
+            chance = random.randint(0, 2500)
+            if chance == 2499:
                 self.in_field = True
                 self.pos = self.make_new_coord()
                 self.cell_pos = self.pos[0] // CELL_SIZE, self.pos[1] // CELL_SIZE
                 self.rect.center = self.pos[0] + CELL_SIZE // 2, self.pos[1] + CELL_SIZE // 2
-                effect_obj.forced_call(self.rect.center)
+                effect_obj.add(self.rect.center, click_lights)
     def draw(self, surf):
         if self.in_field:
             surf.blit(self.image, self.rect)

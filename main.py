@@ -30,16 +30,11 @@ def draw_text(surf, text, size, x, y, color):
     surf.blit(text_surface, text_rect)
 
 
-def start_GameLoop(state):
-    GameLoop(state)
-
-
-
 def SettingLoop():
     Snake.initialize(snake_material)
     MirrorMode = CheckBox(checkmark, highlited_checkbox, highlited_mark, (435, 145), (70, 70))
-    StartGame = Button((248, 501), (165, 58), start_GameLoop, highlited_start)
-    ClickEffect = Light(click_lights, 11)
+    StartGame = Button((248, 501), (165, 58), lambda: True, highlited_start)
+    ClickEffect = Light()
 
     pos = (0, 0)
     fl = False
@@ -54,13 +49,17 @@ def SettingLoop():
             if event.type == pg.QUIT:
                 running = False
             if event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                ClickEffect.add(pg.mouse.get_pos(), click_lights)
                 was_click = True
         pos = pg.mouse.get_pos()
 
         # Обновление
         MirrorMode.update(was_click, pos)
-        StartGame.update(was_click, pos, MirrorMode.get_state())
-        ClickEffect.update(was_click, pos)
+        if StartGame.update(was_click, pos):
+            GameLoop(MirrorMode.get_state())
+            was_click = False
+            ClickEffect.stop_all()
+        ClickEffect.update()
         # Рендеринг
         screen.fill(BLACK)
         screen.blit(set_screen, (0, 0))
@@ -75,10 +74,8 @@ def GameLoop(is_mirrored):
     Player = Snake(6, 'player', is_mirrored, snake_material)
     Feed = Food()
     Multy = Multiplier(multiplier_img)
-    ClickEffect = Light(click_lights, 11)
+    ClickEffect = Light()
     vector = (0, -1)
-
-    small_side = min(WIDTH, HEIGHT)
 
     advert_rect = pause_img.get_rect(center=(WIDTH//2, HEIGHT//2))
 
@@ -117,6 +114,7 @@ def GameLoop(is_mirrored):
                 elif key == 27:
                     paused = True
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                ClickEffect.add(pg.mouse.get_pos(), click_lights)
                 was_click = True
         pos = pg.mouse.get_pos()
 
@@ -126,7 +124,7 @@ def GameLoop(is_mirrored):
             Player.update(vector)
             Feed.update(Player, Multy)
             Multy.update(Player, ClickEffect)
-        ClickEffect.update(was_click, pos)
+        ClickEffect.update()
 
         if Player.check_for_loose():
             lost = True
@@ -144,6 +142,7 @@ def GameLoop(is_mirrored):
         if paused:
             screen.blit(pause_img, advert_rect)
             if SettingBut.update(was_click, pos):
+                ClickEffect.stop()
                 return
             SettingBut.draw(screen)
         if lost:
